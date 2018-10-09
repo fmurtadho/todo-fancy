@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>TodoList App</title>
-	<!-- bootstrap cdn -->
-	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
-	<!-- google fonts -->
+    <title>TodoList App</title>
+    <!-- bootstrap cdn -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+    <!-- google fonts -->
     <link href="https://fonts.googleapis.com/css?family=Righteous" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+        crossorigin="anonymous">
     <style>
-            * {
+        * {
                 box-sizing: border-box;
             }
             
@@ -34,50 +37,49 @@
             }
         </style>
 </head>
+
 <body>
 
     <h2>TodoList App</h2>
     <button id="logout" align="right">Logout</button>
     <div class="row">
-      <div class="column left" style="background-color:#aaa;">
-        <h2>Add New Task</h2>
-        <label>Name</label>
-        <br>
-        <input type="text" id="task_name">
-        <br>
-        <label>Description</label>
-        <br>
-        <input type="text" id="task_description">
-        <br>
-        <label>Due Date</label>
-        <br>
-        <input type="date" id="task_dueDate">
-        <br>
-        <br>
-        <button id="create_task">Add Task</button>
-      </div>
-      <div class="column right" style="background-color:#bbb;">
-        <h2>Tasks</h2>
-        <div id="task-list">
-            
+        <div class="column left" style="background-color:#aaa;">
+            <h2>Add New Task</h2>
+            <label>Name</label>
+            <br>
+            <input type="text" id="task_name">
+            <br>
+            <label>Description</label>
+            <br>
+            <input type="text" id="task_description">
+            <br>
+            <label>Due Date</label>
+            <br>
+            <input type="date" id="task_dueDate">
+            <br>
+            <br>
+            <button id="create_task">Add Task</button>
         </div>
-      </div>
+        <div class="column right" style="background-color:#bbb;">
+            <h2>Tasks</h2>
+            <div id="task-list">
+
+            </div>
+        </div>
     </div>
-    
+
 </body>
-<script
-src="https://code.jquery.com/jquery-3.3.1.min.js"
-integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
 <script>
     let token = localStorage.getItem('token')
-    if (!token) window.location = 'login.html'
+    if (!token) window.location = 'loginv2.html'
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         myTasks()
     })
 
-    $("#logout").click(function(){
+    $("#logout").click(function () {
         localStorage.removeItem('token')
         location.reload()
     })
@@ -92,31 +94,34 @@ crossorigin="anonymous"></script>
             description,
             dueDate
         }
-        if(name.length > 1 && description.length > 1){
+        if (name.length > 1 && description.length > 1) {
             $.ajax({
-                method: "POST",
-                url: "http://localhost:3000/todo/create",
-                data,
-                headers: {
-                    token: localStorage.getItem('token')
-                }
-            })
-            .done(function (task) {
-                // $('#status').text('create task success')
-                $('#task-list').empty()
-                myTasks()
-            })
-            .fail(function (err) {
-                // $("#task_name").val('error')
-                // $("#task_description").val('error')
-            })
-        }else{
+                    method: "POST",
+                    url: "http://localhost:3000/todo/create",
+                    data,
+                    headers: {
+                        token: localStorage.getItem('token')
+                    }
+                })
+                .done(function (task) {
+                    // $('#status').text('create task success')
+                    $('#task-list').empty()
+                    $("#task_name").val('')
+                    $("#task_description").val('')
+                    $("#task_dueDate").val('')
+                    myTasks()
+                })
+                .fail(function (err) {
+                    // $("#task_name").val('error')
+                    // $("#task_description").val('error')
+                })
+        } else {
             $("#task_name").val('cannot be empty')
             $("#task_description").val('cannot be empty')
         }
     })
 
-    function myTasks(){
+    function myTasks() {
         $.ajax({
                 method: "GET",
                 url: "http://localhost:3000/todo/read",
@@ -130,14 +135,21 @@ crossorigin="anonymous"></script>
                 // console.log(data.task.todoList)
                 let todoList = data.task.todoList
                 $('#status').text(`read tasks of ${data.task.name} success`)
-                
-                for(let i = 0 ; i < todoList.length ; i ++){
-                    let cb = `<input type="checkbox" onclick="completing('${todoList[i]._id}')"><br>`
-                    if(todoList[i].status == true){
-                        cb = `<input type="checkbox" checked><br>`
+
+                for (let i = 0; i < todoList.length; i++) {
+                    let cb = `<i class="fas fa-times"></i>`
+                    let completeOrUncomplete =
+                        `<button id="" onclick="completing('${todoList[i]._id}')">Complete</button>`
+                    if (todoList[i].status == true) {
+                        cb = `<i class="fas fa-check"></i>`
+                        completeOrUncomplete =
+                            `<button id="" onclick="uncompleting('${todoList[i]._id}')">Uncomplete</button>`
                     }
-                    
-                    $('#task-list').append(`
+
+
+
+                    $('#task-list').append(
+                        `
                     <h2>${todoList[i].name} ${cb}</h2>
                     <p>
                     <b>Description : </b> ${todoList[i].name}
@@ -145,22 +157,23 @@ crossorigin="anonymous"></script>
                     <b>Due Date :</b> ${todoList[i].dueDate}
                     </p>
                     <div id="edit${todoList[i]._id}"></div>
-                    <button id="" onclick="completing('${todoList[i]._id}')">Mark as completed</button><button class="edit" id="button${todoList[i]._id}" onclick="editing('${todoList[i]._id}')">Edit</button><button class="delete" onclick="deleting('${todoList[i]._id}')">Delete</button>
-                    `)
+                    ${completeOrUncomplete}<button class="edit" id="button${todoList[i]._id}" onclick="editing('${todoList[i]._id}')">Edit</button><button class="delete" onclick="deleting('${todoList[i]._id}')">Delete</button>
+                    `
+                    )
                 }
             })
             .fail(function (err) {
                 console.log(err)
                 $('#status').text('error')
-        })
+            })
     }
 
 
-    function hideTasks(){
+    function hideTasks() {
         $('#task-list').empty()
     }
 
-    function deleting(id){
+    function deleting(id) {
         $.ajax({
                 method: "DELETE",
                 url: `http://localhost:3000/todo/delete/${id}`,
@@ -176,10 +189,10 @@ crossorigin="anonymous"></script>
             .fail(function (err) {
                 console.log(err)
                 $('#status').text('error')
-        })
+            })
     }
 
-    function completing(id){
+    function completing(id) {
         $.ajax({
                 method: "PUT",
                 url: `http://localhost:3000/todo/complete/${id}`,
@@ -195,14 +208,34 @@ crossorigin="anonymous"></script>
             .fail(function (err) {
                 console.log(err)
                 $('#status').text('error')
-        })
+            })
     }
 
-    function editing(id){
+    function uncompleting(id) {
+        $.ajax({
+                method: "PUT",
+                url: `http://localhost:3000/todo/uncomplete/${id}`,
+                headers: {
+                    token: localStorage.getItem('token')
+                }
+            })
+            .done(function () {
+                $('#status').text('uncompleting success')
+                $('#task-list').empty()
+                myTasks()
+            })
+            .fail(function (err) {
+                console.log(err)
+                $('#status').text('error')
+            })
+    }
+
+    function editing(id) {
         $(`#button${id}`).hide()
 
         $(`#edit${id}`).empty()
-        $(`#edit${id}`).append(`
+        $(`#edit${id}`).append(
+            `
         <form>
         <label>name</label>
         <input type='text' id='name${id}'>
@@ -212,17 +245,18 @@ crossorigin="anonymous"></script>
         <input type='date'>
         <button onclick="confirmEdit('${id}')">Update</button>
         </form>
-        `)
+        `
+        )
     }
 
-    function confirmEdit(id){
+    function confirmEdit(id) {
         let name = $(`#name${id}`).val()
         // console.log(name)
         let description = $(`#description${id}`).val()
         // console.log(description)
         let data = {
-        name,
-        description
+            name,
+            description
         }
         $.ajax({
                 method: "PUT",
@@ -239,7 +273,8 @@ crossorigin="anonymous"></script>
             .fail(function (err) {
                 console.log(err)
                 $('#status').text('error')
-        })
-	}
+            })
+    }
 </script>
+
 </html>

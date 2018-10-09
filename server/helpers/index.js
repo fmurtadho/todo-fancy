@@ -1,12 +1,11 @@
 const bcrypt = require('bcrypt')
 
 module.exports = {
-    encrypt: function (email,password) {
+    encrypt: function (password) {
         return new Promise(function (resolve, reject) {
             const saltRound = 10
-            const text = email + password
             bcrypt.genSalt(saltRound, function (err, salt) {
-                bcrypt.hash(text, salt, function (err, hash) {
+                bcrypt.hash(password, salt, function (err, hash) {
                     if (!err) {
                         resolve(hash)
                     } else {

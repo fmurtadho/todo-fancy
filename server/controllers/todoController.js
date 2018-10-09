@@ -103,6 +103,23 @@ class Controller {
             })
         })
     }
+
+    static uncomplete(req,res){
+        Todo.findOneAndUpdate(
+            { _id : req.params.id},
+            { status : false }
+        )
+        .then(function(task){
+            res.status(200).json({
+                message : `${task.name} uncompleted...`
+            })
+        })
+        .catch(function(err){
+            res.status(500).json({
+                err
+            })
+        })
+    }
 }
 
 module.exports = Controller;

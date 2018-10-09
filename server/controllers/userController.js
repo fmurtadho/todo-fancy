@@ -8,6 +8,12 @@ const axios = require('axios')
 
 class Controller {
     static signup(req,res){
+        if(req.body.password.length < 8){
+            res.status(500).json({
+                message : "password length is less than 8"
+            })
+        }
+
         encrypt(req.body.email, req.body.password)
         .then(function(encryptedPassword) {
             let newUser = new User({
@@ -16,7 +22,8 @@ class Controller {
                 phoneNumber: req.body.phone,
                 address : req.body.address,
                 email:   req.body.email,
-                password: encryptedPassword
+                password: encryptedPassword,
+                isOauth: false
             })
             return newUser
         })
@@ -37,14 +44,13 @@ class Controller {
     }
 
     static signin(req,res){
-        console.log('signin proces...')
+        
         User.findOne({
             email : req.body.email
         })
         .then(function(dataUser){
-            console.log(dataUser)
-            let text = req.body.email + req.body.password
-            let decrypt = bcrypt.compareSync(text, dataUser.password); // true
+            
+            let decrypt = bcrypt.compareSync(req.body.password, dataUser.password); // true
 
             if(decrypt == true){
                 let token = jwt.sign({
@@ -74,7 +80,7 @@ class Controller {
 
     static signinGoogle(req,res){
         let token = req.headers.token
-        let CLIENT_ID = '914329180688-r067v7odjksdgah8f84o0aqruqa95566.apps.googleusercontent.com'
+        let CLIENT_ID = process.env.clientid
         const client = new OAuth2Client(CLIENT_ID);
         async function verify() {
         const ticket = await client.verifyIdToken({
@@ -115,17 +121,17 @@ class Controller {
                     })
                     
                 } else {
-                    // console.log('masuk ke data = null')
+                    
                     let newLogin = new User({
                         name: dataR.data.name,
                         gender : 'login with oauth',
                         address : 'login with oauth',
-                        phoneNumber: dataR.data.email,
+                        phoneNumber: 'login with oauth',
                         email: dataR.data.email,
-                        password: 'login with oauth'
+                        password: null,
+                        isOauth: true
                     })
                     
-                    // console.log('new login',newLogin)
                     newLogin.save()
 
                     let token = jwt.sign({

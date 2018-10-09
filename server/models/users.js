@@ -1,10 +1,25 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const validate = require('mongoose-validator');
+
+var nameValidator = [
+  validate({
+    validator: 'isLength',
+    arguments: [3, 50],
+    message: 'Name should be between {ARGS[0]} and {ARGS[1]} characters',
+  }),
+  validate({
+    validator: 'isAlphanumeric',
+    passIfEmpty: true,
+    message: 'Name should contain alpha-numeric characters only',
+  }),
+]
 
 const userSchema = new Schema({
   name:   {
     type: String,
-    required: [true,'Error "name" is required']
+    required: [true,'Error "name" is required'],
+    validate: nameValidator
   },
   gender: {
     type: String,
@@ -20,11 +35,14 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: [true, 'Error "email" is required']
+    required: [true, 'Error "email" is required'],
+    validate: nameValidator
   },
   password: {
-    type: String,
-    required: [true, 'Error "password" is required']
+    type: String
+  },
+  isOauth: {
+    type : Boolean
   },
   todoList: [{ type: Schema.Types.ObjectId, ref: 'Todo' }]
 }, {
