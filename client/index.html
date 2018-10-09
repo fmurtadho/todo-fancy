@@ -44,21 +44,25 @@
     <button id="logout" align="right">Logout</button>
     <div class="row">
         <div class="column left" style="background-color:#aaa;">
-            <h2>Add New Task</h2>
-            <label>Name</label>
-            <br>
-            <input type="text" id="task_name">
-            <br>
-            <label>Description</label>
-            <br>
-            <input type="text" id="task_description">
-            <br>
-            <label>Due Date</label>
-            <br>
-            <input type="date" id="task_dueDate">
-            <br>
-            <br>
-            <button id="create_task">Add Task</button>
+            <div id="add-new-task">
+                <h2>Add New Task</h2>
+                <label>Name</label>
+                <br>
+                <input type="text" id="task_name">
+                <br>
+                <label>Description</label>
+                <br>
+                <input type="text" id="task_description">
+                <br>
+                <label>Due Date</label>
+                <br>
+                <input type="date" id="task_dueDate">
+                <br>
+                <br>
+                <button id="create_task">Add Task</button>
+            </div>
+            <div id="edit-task">
+            </div>
         </div>
         <div class="column right" style="background-color:#bbb;">
             <h2>Tasks</h2>
@@ -157,7 +161,7 @@
                     <b>Due Date :</b> ${todoList[i].dueDate}
                     </p>
                     <div id="edit${todoList[i]._id}"></div>
-                    ${completeOrUncomplete}<button class="edit" id="button${todoList[i]._id}" onclick="editing('${todoList[i]._id}')">Edit</button><button class="delete" onclick="deleting('${todoList[i]._id}')">Delete</button>
+                    ${completeOrUncomplete}<button class="edit" id="button-edit${todoList[i]._id}" onclick="editing('${todoList[i]._id}','${todoList[i].name}','${todoList[i].description}','${todoList[i].dueDate}')">Edit</button><button class="delete" onclick="deleting('${todoList[i]._id}')">Delete</button>
                     `
                     )
                 }
@@ -230,34 +234,46 @@
             })
     }
 
-    function editing(id) {
-        $(`#button${id}`).hide()
+    function editing(id, name, description, dueDate) {
+        $(`#button-edit${id}`).hide()
 
-        $(`#edit${id}`).empty()
-        $(`#edit${id}`).append(
-            `
-        <form>
-        <label>name</label>
-        <input type='text' id='name${id}'>
-        <label>description</label>
-        <input type='text' id='description${id}'>
-        <label>date</label>
-        <input type='date'>
+        $(`#add-new-task`).hide()
+        $(`#edit-task`).show()
+        $(`#edit-task`).append(`
+        <h2>Edit Task</h2>
+        <label>Name</label>
+        <br>
+        <input type='text' id='name${id}' value='${name}'>
+        <br>
+        <label>Description</label>
+        <br>
+        <input type='text' id='description${id}' value='${description}'>
+        <br>
+        <label>Due Date</label>
+        <br>
+        <input type='date' id='dueDate${id}' value=${dueDate}>
+        <br>
+        <br>
         <button onclick="confirmEdit('${id}')">Update</button>
-        </form>
-        `
-        )
+        `)
+
     }
 
     function confirmEdit(id) {
+        $(`#edit-task`).hide()
+        $(`#add-new-task`).show()
+
         let name = $(`#name${id}`).val()
-        // console.log(name)
         let description = $(`#description${id}`).val()
-        // console.log(description)
+        let dueDate = $(`#dueDate${id}`).val()
+        
         let data = {
             name,
-            description
+            description,
+            dueDate
         }
+
+
         $.ajax({
                 method: "PUT",
                 url: `http://localhost:3000/todo/update/${id}`,
@@ -267,8 +283,10 @@
                 data
             })
             .done(function () {
-                $('#status').text('updating success')
+                // $(`#button-edit${id}`).show()
+                $(`#edit-task`).empty()
                 $('#task-list').empty()
+                myTasks()
             })
             .fail(function (err) {
                 console.log(err)
